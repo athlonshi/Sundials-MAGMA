@@ -29,6 +29,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 /* Header files with a description of contents used */
 
@@ -72,6 +73,10 @@
 #define TMULT RCONST(10.0)     /* output time factor     */
 #define NOUT  12               /* number of output times */
 
+#ifndef WIN32 
+  #define stricmp strcasecmp 
+  #define strnicmp strncasecmp 
+#endif
 
 /* Functions Called by the Solver */
 
@@ -103,13 +108,33 @@ static int check_flag(void *flagvalue, char *funcname, int opt);
  *-------------------------------
  */
 
-int main()
+int main(int argc, char *argv[])
 {
   realtype reltol, t, tout;
   N_Vector y, abstol;
   void *cvode_mem;
   int flag, flagr, iout;
   int rootsfound[2];
+
+  int type=0;
+  if (argc <= 1) {
+    printf("\nCall CPU LU Solver.\n");
+  }
+  else if (argc == 2) {
+    if (stricmp(argv[1],"gpu") == 0) {
+      type = 1;
+      printf("\nCall GPU LU Solver.\n");
+    }
+    else if (stricmp(argv[1],"cpu") == 0) {
+      printf("\nCall CPU LU Solver.\n");
+    }
+    else {
+      printf("\nWrong argument! Use CPU LU Solver as default.\n");
+    }
+  }
+  else {
+    printf("\nWrong argument! Use CPU LU Solver as default.\n");
+  }
 
   y = abstol = NULL;
   cvode_mem = NULL;
@@ -141,6 +166,8 @@ int main()
    * user's right hand side function in y'=f(t,y), the inital time T0, and
    * the initial dependent variable vector y. */
   flag = CVodeInit(cvode_mem, f, T0, y);
+  flag = CVodesInitGPU(cvode_mem, type); //set CPU solver
+
   if (check_flag(&flag, "CVodeInit", 1)) return(1);
 
   /* Call CVodeSVtolerances to specify the scalar relative tolerance
