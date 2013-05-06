@@ -263,6 +263,7 @@ typedef struct CVodeMemRec {
   booleantype *cv_gactive; /* array with active/inactive event functions      */
   int cv_mxgnull;          /* number of warning messages about possible g==0  */
 
+  booleantype GPU;          /* 0 Use CPU LU solver, 1 Use GPU LU solver*/  
 
 } *CVodeMem;
 
@@ -475,6 +476,7 @@ void CVErrHandler(int error_code, const char *module, const char *function,
 #define MSGCV_NULL_DKY "dky = NULL illegal."
 #define MSGCV_BAD_T "Illegal value for t." MSG_TIME_INT
 #define MSGCV_NO_ROOT "Rootfinding was not initialized."
+#define MSGCV_TYPE "Type has to be 0 or 1 for CPU or GPU solver"
 
 /* CVode Error Messages */
 

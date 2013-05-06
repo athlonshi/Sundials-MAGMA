@@ -436,6 +436,8 @@ typedef struct CVodeMemRec {
   booleantype *cv_gactive; /* array with active/inactive event functions      */
   int cv_mxgnull;          /* number of warning messages about possible g==0  */
 
+  booleantype GPU;          /* 0 Use CPU LU solver, 1 Use GPU LU solver*/
+
   /*------------------------
     Adjoint sensitivity data
     ------------------------*/
@@ -1080,6 +1082,7 @@ int cvSensRhs1InternalDQ(int Ns, realtype t,
 #define MSGCV_BACK_ERROR  "Error occured while integrating backward problem # %d" 
 #define MSGCV_BAD_TINTERP "Bad t = %g for interpolation."
 #define MSGCV_WRONG_INTERP "This function cannot be called for the specified interp type."
+#define MSGCV_TYPE "Type has to be 0 or 1 for CPU or GPU solver"
 
 #ifdef __cplusplus
 }

@@ -472,7 +472,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os SET_MAKE INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP FGREP F77 FFLAGS ac_ct_F77 FLIBS MPICC_COMP MPIF77_COMP SED LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP DLLTOOL ac_ct_DLLTOOL AS ac_ct_AS OBJDUMP ac_ct_OBJDUMP CXX CXXFLAGS ac_ct_CXX CXXCPP LIBTOOL SHARED_LIBS MPICC MPIF77 MPI_INC_DIR MPI_LIB_DIR MPI_LIBS MPI_FLAGS FCMIX_ENABLED FLOAT_TYPE LIBTOOL_DEPS F77_MANGLE_MACRO1 F77_MANGLE_MACRO2 F77_CASE F77_UNDERSCORES PRECISION_LEVEL GENERIC_MATH_LIB BLAS_LAPACK_MACRO SUNDIALS_EXPORT F77_MPI_COMM_F2C F77_LNKR F77_LIBS F77_LDFLAGS LAPACK_ENABLED BLAS_LAPACK_LIBS MPIF77_LNKR SLV_MODULES EXS_MODULES EXS_INSTDIR LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir cudainclude cudalib magmainclude magmalib oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os SET_MAKE INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP FGREP F77 FFLAGS ac_ct_F77 FLIBS MPICC_COMP MPIF77_COMP SED LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP DLLTOOL ac_ct_DLLTOOL AS ac_ct_AS OBJDUMP ac_ct_OBJDUMP CXX CXXFLAGS ac_ct_CXX CXXCPP LIBTOOL SHARED_LIBS MPICC MPIF77 MPI_INC_DIR MPI_LIB_DIR MPI_LIBS MPI_FLAGS FCMIX_ENABLED FLOAT_TYPE LIBTOOL_DEPS F77_MANGLE_MACRO1 F77_MANGLE_MACRO2 F77_CASE F77_UNDERSCORES PRECISION_LEVEL GENERIC_MATH_LIB BLAS_LAPACK_MACRO SUNDIALS_EXPORT F77_MPI_COMM_F2C F77_LNKR F77_LIBS F77_LDFLAGS LAPACK_ENABLED BLAS_LAPACK_LIBS MPIF77_LNKR SLV_MODULES EXS_MODULES EXS_INSTDIR LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -625,6 +625,26 @@ do
   -libexecdir=* | --libexecdir=* | --libexecdi=* | --libexecd=* | --libexec=* \
   | --libexe=* | --libex=* | --libe=*)
     libexecdir=$ac_optarg ;;
+
+     --cudainclude)
+    ac_prev=cudainclude ;;
+  --cudainclude=*)
+    cudainclude=$ac_optarg ;;
+
+     --cudalib)
+    ac_prev=cudalib ;;
+  --cudalib=*)
+    cudalib=$ac_optarg ;;
+
+     --magmainclude)
+    ac_prev=magmainclude ;;
+  --magmainclude=*)
+    magmainclude=$ac_optarg ;;
+
+     --magmalib)
+    ac_prev=magmalib ;;
+  --magmalib=*)
+    magmalib=$ac_optarg ;;
 
   -localstatedir | --localstatedir | --localstatedi | --localstated \
   | --localstate | --localstat | --localsta | --localst \
@@ -812,6 +832,26 @@ Try \`$0 --help' for more information." >&2
   esac
 done
 
+if test -z "$cudainclude"; then
+  { echo "missing argument to cudainclude" >&2
+   { (exit 1); exit 1; }; }
+fi
+
+if test -z "$cudalib"; then
+  { echo "missing argument to cudalib" >&2
+   { (exit 1); exit 1; }; }
+fi
+
+if test -z "$magmainclude"; then
+  { echo "missing argument to magmainclude" >&2
+   { (exit 1); exit 1; }; }
+fi
+
+if test -z "$magmalib"; then
+  { echo "missing argument to magmalib" >&2
+   { (exit 1); exit 1; }; }
+fi
+
 if test -n "$ac_prev"; then
   ac_option=--`echo $ac_prev | sed 's/_/-/g'`
   { echo "$as_me: error: missing argument to $ac_option" >&2
@@ -831,7 +871,8 @@ done
 
 # Be sure to have absolute paths.
 for ac_var in bindir sbindir libexecdir datadir sysconfdir sharedstatedir \
-	      localstatedir libdir includedir oldincludedir infodir mandir
+	      localstatedir libdir includedir oldincludedir infodir mandir \
+	      cudainclude cudalib magmainclude magmalib 	
 do
   eval ac_val=$`echo $ac_var`
   case $ac_val in
@@ -27194,6 +27235,10 @@ s,@sharedstatedir@,$sharedstatedir,;t t
 s,@localstatedir@,$localstatedir,;t t
 s,@libdir@,$libdir,;t t
 s,@includedir@,$includedir,;t t
+s,@cudainclude@, $cudainclude,;t t
+s,@cudalib@, $cudalib,;t t
+s,@magmainclude@, $magmainclude,;t t
+s,@magmalib@, $magmalib,;t t
 s,@oldincludedir@,$oldincludedir,;t t
 s,@infodir@,$infodir,;t t
 s,@mandir@,$mandir,;t t

@@ -26,6 +26,10 @@ prefix       = @prefix@
 exec_prefix  = @exec_prefix@
 includedir   = @includedir@
 libdir       = @libdir@
+cudainclude  = @cudainclude@
+cudalib      = @cudalib@
+magmainclude = @magmainclude@
+magmalib     = @magmalib@
 
 INSTALL        = @INSTALL@
 INSTALL_LIB    = @INSTALL_PROGRAM@
@@ -45,13 +49,13 @@ LAPACK_ENABLED = @LAPACK_ENABLED@
 
 top_srcdir = $(srcdir)/../..
 
-INCLUDES = -I$(top_srcdir)/include -I$(top_builddir)/include
+INCLUDES = -I$(top_srcdir)/include -I$(top_builddir)/include -I$(cudainclude) -I$(magmainclude)
 
 LIB_REVISION = 2:0:0
 
 CVODES_LIB    = libsundials_cvodes.la
 
-CVODES_SRC_FILES = cvodes.c cvodes_io.c cvodea.c cvodea_io.c cvodes_direct.c cvodes_band.c cvodes_dense.c cvodes_diag.c cvodes_spils.c cvodes_spbcgs.c cvodes_spgmr.c cvodes_sptfqmr.c cvodes_bandpre.c cvodes_bbdpre.c
+CVODES_SRC_FILES = cvodes.c cvodes_io.c cvodea.c cvodea_io.c cvodes_direct.c cvodes_band.c cvodes_dense.c cvodes_diag.c cvodes_spils.c cvodes_spbcgs.c cvodes_spgmr.c cvodes_sptfqmr.c cvodes_bandpre.c cvodes_bbdpre.c cvodes_gpu.c
 CVODES_BL_SRC_FILES = cvodes_lapack.c
 
 CVODES_OBJ_FILES = $(CVODES_SRC_FILES:.c=.o)
@@ -85,10 +89,10 @@ $(CVODES_LIB): shared $(CVODES_LIB_FILES)
 	fi
 
 lib_without_bl: shared $(CVODES_LIB_FILES)
-	$(LIBTOOL) --mode=link $(CC) $(CFLAGS) -o $(CVODES_LIB) $(CVODES_LIB_FILES) $(SHARED_LIB_FILES) -rpath $(libdir) $(LDFLAGS) $(LIBS) -version-info $(LIB_REVISION)
+	$(LIBTOOL) --mode=link $(CC) $(CFLAGS) -o $(CVODES_LIB) $(CVODES_LIB_FILES) $(SHARED_LIB_FILES) -rpath $(libdir) $(LDFLAGS) $(LIBS) -L$(cudalib) -lcuda -lcublas -L$(magmalib) -lmagma -lmagmablas -version-info $(LIB_REVISION)
 
 lib_with_bl: shared $(CVODES_LIB_FILES) $(CVODES_BL_LIB_FILES)
-	$(LIBTOOL) --mode=link $(CC) $(CFLAGS) -o $(CVODES_LIB) $(CVODES_LIB_FILES) $(CVODES_BL_LIB_FILES) $(SHARED_LIB_FILES) -rpath $(libdir) $(LDFLAGS) $(LIBS) -version-info $(LIB_REVISION)
+	$(LIBTOOL) --mode=link $(CC) $(CFLAGS) -o $(CVODES_LIB) $(CVODES_LIB_FILES) $(CVODES_BL_LIB_FILES) $(SHARED_LIB_FILES) -rpath $(libdir) $(LDFLAGS) $(LIBS) -L$(cudalib) -lcuda -lcublas -L$(magmalib) -lmagma -lmagmablas -version-info $(LIB_REVISION)
 
 install: $(CVODES_LIB)
 	$(mkinstalldirs) $(includedir)/cvodes
@@ -105,6 +109,7 @@ install: $(CVODES_LIB)
 	$(INSTALL_HEADER) $(top_srcdir)/include/cvodes/cvodes_sptfqmr.h $(includedir)/cvodes/
 	$(INSTALL_HEADER) $(top_srcdir)/include/cvodes/cvodes_bandpre.h $(includedir)/cvodes/
 	$(INSTALL_HEADER) $(top_srcdir)/include/cvodes/cvodes_bbdpre.h  $(includedir)/cvodes/
+	$(INSTALL_HEADER) $(top_srcdir)/include/cvodes/cvodes_gpu.h     $(includedir)/cvodes/
 	$(INSTALL_HEADER) $(top_srcdir)/src/cvodes/cvodes_impl.h        $(includedir)/cvodes/
 	@if test "X${LAPACK_ENABLED}" = "Xyes"; then \
 	  $(INSTALL_HEADER) $(top_srcdir)/include/cvodes/cvodes_lapack.h  $(includedir)/cvodes/ ; \
@@ -125,6 +130,7 @@ uninstall:
 	rm -f $(includedir)/cvodes/cvodes_bandpre.h
 	rm -f $(includedir)/cvodes/cvodes_bbdpre.h
 	rm -f $(includedir)/cvodes/cvodes_impl.h
+	rm -f $(includedir)/cvodes/cvodes_gpu.h
 	$(rminstalldirs) ${includedir}/cvodes
 
 shared:
@@ -172,7 +178,8 @@ cvodes_bandpre.lo: $(srcdir)/cvodes_bandpre.c
 	$(LIBTOOL) --mode=compile $(CC) $(CPPFLAGS) $(INCLUDES) $(CFLAGS) -c $(srcdir)/cvodes_bandpre.c
 cvodes_bbdpre.lo: $(srcdir)/cvodes_bbdpre.c
 	$(LIBTOOL) --mode=compile $(CC) $(CPPFLAGS) $(INCLUDES) $(CFLAGS) -c $(srcdir)/cvodes_bbdpre.c
-
+cvodes_gpu.lo: $(srcdir)/cvodes_gpu.c
+	$(LIBTOOL) --mode=compile $(CC) $(CPPFLAGS) $(INCLUDES) $(CFLAGS) -c $(srcdir)/cvodes_gpu.c
 
 libtool: $(top_builddir)/$(LIBTOOL_DEPS)
 	@cd ${top_builddir} ;                 \

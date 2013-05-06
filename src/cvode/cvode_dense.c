@@ -23,6 +23,8 @@
 #include "cvode_impl.h"
 
 #include <sundials/sundials_math.h>
+/*For GPU*/
+#include <cvode/cvode_gpu.h>
 
 /* Constants */
 
@@ -149,6 +151,12 @@ int CVDense(void *cvode_mem, long int N)
   /* Set problem dimension */
   n = N;
 
+  /* Allocate GPU memory to d_A */
+  if ( cv_mem->GPU ) {
+    int ldda  = ((N+31)/32)*32;
+    MAGMA_DEVALLOC( d_A, double, ldda*N );
+    MAGMA_HOSTALLOC( h_A, double, ldda*N );
+  }
   /* Allocate memory for M, savedJ, and pivot array */
 
   M = NULL;
@@ -280,8 +288,13 @@ static int cvDenseSetup(CVodeMem cv_mem, int convfail, N_Vector ypred,
   AddIdentity(M);
 
   /* Do LU factorization of M */
-  ier = DenseGETRF(M, lpivots); 
-
+  if ( cv_mem->GPU ) {
+    ier = DenseGETRFGPU(M, lpivots); 
+  }
+  else {
+    ier = DenseGETRF(M, lpivots);
+  }
+  
   /* Return 0 if the LU was complete; otherwise return 1 */
   last_flag = ier;
   if (ier > 0) return(1);
@@ -330,6 +343,12 @@ static void cvDenseFree(CVodeMem cv_mem)
 {
   CVDlsMem  cvdls_mem;
 
+/*Free GPU resource*/
+  if ( cv_mem->GPU ) {
+     MAGMA_DEVFREE(d_A);
+     MAGMA_HOSTFREE(h_A);
+  }
+ 
   cvdls_mem = (CVDlsMem) lmem;
   
   DestroyMat(M);

@@ -1,3 +1,12 @@
+####################################################################
+Install configuration example with CUDA and MAGMA
+./configure --with-cflags=-fPIC --enable-examples --disable-mpi CC=gcc F77=gfortran --cudainclude=/usr/local/cuda/include/ --cudalib=/usr/local/cuda/lib64/ --magmainclude=/media/sda5/Ubuntu/software/magma-1.3.0/include/ --magmalib=/media/sda5/Ubuntu/software/magma-1.3.0/lib/
+
+Should download and install
+CUDA: https://developer.nvidia.com/cuda-downloads
+MAGMA1.3: http://icl.cs.utk.edu/magma/software/
+
+####################################################################
                      SUNDIALS Installation Instructions
                         Release 2.7.0, March 2011  
 

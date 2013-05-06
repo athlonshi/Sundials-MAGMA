@@ -1,3 +1,7 @@
+                            SUNDIALS-MAGMA
+Enable SUNDIALS CVODE and CVODES solvers to use GPU-based MAGMA LU factorization solver
+Requires CUDA and MAGMA being installed. See INSTALL_NOTES for more details 
+
                             SUNDIALS 
     SUite of Nonlinear and DIfferential/ALgebraic equation Solvers
                    Release 2.5.0, March 2012
