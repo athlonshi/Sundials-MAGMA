@@ -67,25 +67,21 @@ long int DenseGETRFGPU(DlsMat A, long int *p)
   int lda = M;
   int ldda = ((M+31)/32)*32;
   int info;
-  int i, j;
   int p1[M];
   
-/*Copy to a temporary CPU*/ 
-  for(i=0; i<M; i++)
-    for(j=0; j<N; j++) h_A[j*M+i] = DENSE_ELEM(A,i,j);
+  /*Copy to a temporary from CPU*/
+  memcpy(h_A, A->data, M*N*sizeof(double));
 
 /*Call MAGMA LU factorization solver*/
   magma_dsetmatrix( M, N, h_A, lda, d_A, ldda ); 
   magma_dgetrf_gpu( M, N, d_A, ldda, p1, &info);
   magma_dgetmatrix( M, N, d_A, ldda, h_A, lda );
 
-/*Put back to CPU*/
-  for(i=0; i<M; i++) {
+  /*Put back to CPU*/
+  for(int i=0; i<M; i++) {
     p[i] = p1[i]-1 ;
-    for(j=0; j<N; j++) {
-      DENSE_ELEM(A,i,j) = h_A[j*M+i];
-    }
   }
+  memcpy(A->data, h_A, M*N*sizeof(double));
 
   return(info);
 
