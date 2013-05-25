@@ -155,7 +155,6 @@ int CVDense(void *cvode_mem, long int N)
   if ( cv_mem->GPU ) {
     int ldda  = ((N+31)/32)*32;
     MAGMA_DEVALLOC( d_A, double, ldda*N );
-    MAGMA_HOSTALLOC( h_A, double, ldda*N );
   }
   /* Allocate memory for M, savedJ, and pivot array */
 
@@ -346,7 +345,6 @@ static void cvDenseFree(CVodeMem cv_mem)
 /*Free GPU resource*/
   if ( cv_mem->GPU ) {
      MAGMA_DEVFREE(d_A);
-     MAGMA_HOSTFREE(h_A);
   }
  
   cvdls_mem = (CVDlsMem) lmem;

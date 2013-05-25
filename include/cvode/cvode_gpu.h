@@ -102,7 +102,6 @@ SUNDIALS_EXPORT long int DenseGETRFGPU(DlsMat A, long int *p);
 
 /*Define global variable allocated to GPU*/
 double *d_A ;
-double *h_A ;
 
 #ifdef __cplusplus  /* wrapper to enable C++ usage */
 }

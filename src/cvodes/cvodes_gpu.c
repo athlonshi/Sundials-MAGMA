@@ -62,6 +62,7 @@ int CVodesInitGPU(void *cvode_mem, int type)
 
 long int DenseGETRFGPU(DlsMat A, long int *p)
 { 
+  int i;
   int M = A->M;
   int N = A->N;
   int lda = M;
@@ -69,19 +70,15 @@ long int DenseGETRFGPU(DlsMat A, long int *p)
   int info;
   int p1[M];
   
-  /*Copy to a temporary from CPU*/
-  memcpy(h_A, A->data, M*N*sizeof(double));
-
-/*Call MAGMA LU factorization solver*/
-  magma_dsetmatrix( M, N, h_A, lda, d_A, ldda ); 
+  /*Call MAGMA LU factorization solver*/
+  magma_dsetmatrix( M, N, A->data, lda, d_A, ldda ); 
   magma_dgetrf_gpu( M, N, d_A, ldda, p1, &info);
-  magma_dgetmatrix( M, N, d_A, ldda, h_A, lda );
+  magma_dgetmatrix( M, N, d_A, ldda, A->data, lda );
 
   /*Put back to CPU*/
-  for(int i=0; i<M; i++) {
+  for(i=0; i<M; i++) {
     p[i] = p1[i]-1 ;
   }
-  memcpy(A->data, h_A, M*N*sizeof(double));
 
   return(info);
 
