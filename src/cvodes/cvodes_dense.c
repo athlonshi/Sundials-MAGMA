@@ -158,10 +158,12 @@ int CVDense(void *cvode_mem, long int N)
   /* Set problem dimension */
   n = N;
 
-  /* Allocate GPU memory to d_A */
+  /* Allocate GPU memory to d_A and d_B */
   if ( cv_mem->GPU ) {
-    int ldda  = ((N+31)/32)*32;
+    int ldda = ((N+31)/32)*32;
+    int lddb = N;  
     MAGMA_DEVALLOC( d_A, double, ldda*N );
+    MAGMA_DEVALLOC( d_B, double, lddb*N );
   }
   /* Allocate memory for M, savedJ, and pivot array */
 
@@ -326,7 +328,13 @@ static int cvDenseSolve(CVodeMem cv_mem, N_Vector b, N_Vector weight,
   
   bd = N_VGetArrayPointer(b);
 
-  DenseGETRS(M, lpivots, bd);
+  /*Use GPU*/
+  if ( cv_mem->GPU ) {
+    DenseGETRSGPU(M, lpivots, bd);
+  }
+  else {
+    DenseGETRS(M, lpivots, bd);
+  }
 
   /* If CV_BDF, scale the correction to account for change in gamma */
   if ((lmm == CV_BDF) && (gamrat != ONE)) {
@@ -352,6 +360,7 @@ static void cvDenseFree(CVodeMem cv_mem)
 /*Free GPU resource*/
   if ( cv_mem->GPU ) {
      MAGMA_DEVFREE(d_A);
+     MAGMA_DEVFREE(d_B);
   }
 
   cvdls_mem = (CVDlsMem) lmem;

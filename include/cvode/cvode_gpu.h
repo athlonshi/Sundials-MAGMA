@@ -59,6 +59,7 @@ extern "C" {
 
 SUNDIALS_EXPORT int CVodeInitGPU(void *cvode_mem, int type);
 SUNDIALS_EXPORT long int DenseGETRFGPU(DlsMat A, long int *p);
+SUNDIALS_EXPORT long int DenseGETRSGPU(DlsMat A, long int *p, realtype *B);
 
 #define MAGMA_CUDA_INIT()                                                  \
     if( CUBLAS_STATUS_SUCCESS != cublasInit() ) {                          \
@@ -102,6 +103,7 @@ SUNDIALS_EXPORT long int DenseGETRFGPU(DlsMat A, long int *p);
 
 /*Define global variable allocated to GPU*/
 double *d_A ;
+double *d_B ;
 
 #ifdef __cplusplus  /* wrapper to enable C++ usage */
 }

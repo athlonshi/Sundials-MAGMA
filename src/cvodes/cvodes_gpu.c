@@ -83,3 +83,27 @@ long int DenseGETRFGPU(DlsMat A, long int *p)
   return(info);
 
 }
+
+long int DenseGETRSGPU(DlsMat A, long int *p, realtype *B)
+{
+  int i;
+  int M = A->M;
+  int N = A->N;
+  int ldb = N;
+  int ldda = ((M+31)/32)*32;
+  int lddb = M;
+  int NRHS = 1;
+  int info;
+  int p1[M];
+
+  /*Call MAGMA linear equation solver*/
+  for(i=0; i<M; i++) {
+    p1[i] = p[i]+1 ;
+  }
+
+  magma_dsetmatrix( M, NRHS, B, ldb, d_B, lddb );
+  magma_dgetrs_gpu( 'N', M, NRHS, d_A, ldda, p1, d_B, lddb, &info );  //NO transpose
+  magma_dgetmatrix( M, NRHS, d_B, lddb, B, ldb );
+
+}
+
